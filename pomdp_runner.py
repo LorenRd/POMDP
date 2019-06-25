@@ -40,65 +40,77 @@ class PomdpRunner:
         visualiser.update(tree.root)
         visualiser.render('./dev/snapshots/{}'.format(filename))  # TODO: parametrise the dev folder path
 
-    def run(self, algo, T, **kwargs):
-        visualiser = GraphViz(description='tmp')
-        params, pomdp = self.params, None
-        total_rewards, budget = 0, params.budget
+    def run(self, modo, algo, T, **kwargs):
+        steps = []
+        rewards = []
+        if modo == "Benchmark":
+            c = 0
+        else:
+            c = 29
+        while c < 30:
+            c += 1
+            visualiser = GraphViz(description='tmp')
+            params, pomdp = self.params, None
+            total_rewards, budget = 0, params.budget
 
-        log.info('~~~ initialising ~~~')
-        with PomdpParser(params.env_config) as ctx:
-            # creates model and solver
-            model = self.create_model(ctx.copy_env())
-            pomdp = self.create_solver(algo, model)
+            log.info('~~~ initialising ~~~')
+            with PomdpParser(params.env_config) as ctx:
+                # creates model and solver
+                model = self.create_model(ctx.copy_env())
+                pomdp = self.create_solver(algo, model)
 
-            # supply additional algo params
-            belief = ctx.random_beliefs() if params.random_prior else ctx.generate_beliefs()
+                # supply additional algo params
+                belief = ctx.random_beliefs() if params.random_prior else ctx.generate_beliefs()
 
-            if algo == 'pbvi':
-                belief_points = ctx.generate_belief_points(kwargs['stepsize'])
-                pomdp.add_configs(belief_points)
-            elif algo == 'pomcp':
-                pomdp.add_configs(budget, belief, **kwargs)
+                if algo == 'pbvi':
+                    belief_points = ctx.generate_belief_points(kwargs['stepsize'])
+                    pomdp.add_configs(belief_points)
+                elif algo == 'pomcp':
+                    pomdp.add_configs(budget, belief, **kwargs)
 
-        # have fun!
-        log.info('''
-        ++++++++++++++++++++++
-            Starting State:  {}
-            Starting Budget:  {}
-            Init Belief: {}
-            Time Horizon: {}
-            Max Play: {}
-        ++++++++++++++++++++++'''.format(model.curr_state, budget, belief, T, params.max_play))
+            # have fun!
+            log.info('''
+            ++++++++++++++++++++++
+                Starting State:  {}
+                Starting Budget:  {}
+                Init Belief: {}
+                Time Horizon: {}
+                Max Play: {}
+            ++++++++++++++++++++++'''.format(model.curr_state, budget, belief, T, params.max_play))
 
-        for i in range(params.max_play):
-            # plan, take action and receive environment feedbacks
-            pomdp.solve(T)
-            action = pomdp.get_action(belief)
-            new_state, obs, reward, cost = pomdp.take_action(action)
+            for i in range(params.max_play):
+                # plan, take action and receive environment feedbacks
+                pomdp.solve(T, modo)
+                action = pomdp.get_action(belief)
+                new_state, obs, reward, cost = pomdp.take_action(action)
 
-            if params.snapshot and isinstance(pomdp, POMCP):
-                # takes snapshot of belief tree before it gets updated
-                self.snapshot_tree(visualiser, pomdp.tree, '{}.gv'.format(i))
-            
-            # update states
-            belief = pomdp.update_belief(belief, action, obs)
-            total_rewards += reward
-            budget -= cost
+                if params.snapshot and isinstance(pomdp, POMCP):
+                    # takes snapshot of belief tree before it gets updated
+                    self.snapshot_tree(visualiser, pomdp.tree, '{}.gv'.format(i))
 
-            # print ino
-            log.info('\n'.join([
-              'Taking action: {}'.format(action),
-              'Observation: {}'.format(obs),
-              'Reward: {}'.format(reward),
-              'Budget: {}'.format(budget),
-              'New state: {}'.format(new_state),
-              'New Belief: {}'.format(belief),
-              '=' * 20
-            ]))
+                # update states
+                belief = pomdp.update_belief(belief, action, obs)
+                total_rewards += reward
+                budget -= cost
 
-            if budget <= 0:
-                log.info('Budget spent.')
+                # print ino
+                if modo == "Iterativo":
+                    log.info('\n'.join([
+                      'Taking action: {}'.format(action),
+                      'Observation: {}'.format(obs),
+                      'Reward: {}'.format(reward),
+                      'Budget: {}'.format(budget),
+                      'New state: {}'.format(new_state),
+                      'New Belief: {}'.format(belief),
+                      'Paso numero: {}'.format(i),
+                      '=' * 20
+                    ]))
 
-
-        log.info('{} games played. Toal reward = {}'.format(i + 1, total_rewards))
+                if budget <= 0:
+                    log.info('Budget spent.')
+            log.info('{} games played. Total reward = {}'.format(i , total_rewards))
+            steps.append(i)
+            rewards.append(total_rewards)
+        print(steps)
+        print(rewards)
         return pomdp

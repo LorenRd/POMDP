@@ -137,7 +137,7 @@ class POMCP(Solver):
 
         return R
 
-    def solve(self, T):
+    def solve(self, T, modo):
         """
         Solves for up to T steps
         """
@@ -147,7 +147,8 @@ class POMCP(Solver):
             n += 1
             state = self.tree.root.sample_state()
             self.simulate(state, max_depth=T, h=self.tree.root.h, budget=self.tree.root.budget)
-        log.info('# Simulation = {}'.format(n))
+        if modo == "Iterativo":
+            log.info('# Simulation = {}'.format(n))
 
     def get_action(self, belief):
         """
