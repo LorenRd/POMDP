@@ -1,3 +1,3 @@
 
 from .model import Model
-from .tiger_sample_problem import TigerSampleModel
+from .rock_sample_problem import RockSampleModel
