@@ -148,7 +148,7 @@ class POMCP(Solver):
             state = self.tree.root.sample_state()
             self.simulate(state, max_depth=T, h=self.tree.root.h, budget=self.tree.root.budget)
         if modo == "Iterativo":
-            log.info('# Simulation = {}'.format(n))
+            log.info('# Simulacion -> {}'.format(n))
 
     def get_action(self, belief):
         """

@@ -4,6 +4,7 @@ from models import RockSampleModel, Model
 from solvers import POMCP, PBVI
 from parsers import PomdpParser, GraphViz
 from logger import Logger as log
+import numpy as math
 
 class PomdpRunner:
 
@@ -41,8 +42,8 @@ class PomdpRunner:
         visualiser.render('./dev/snapshots/{}'.format(filename))  # TODO: parametrise the dev folder path
 
     def run(self, modo, algo, T, **kwargs):
-        steps = []
-        rewards = []
+        steps = math.array([], float)
+        rewards = math.array([], float)
         if modo == "Benchmark":
             c = 0
         else:
@@ -53,7 +54,7 @@ class PomdpRunner:
             params, pomdp = self.params, None
             total_rewards, budget = 0, params.budget
 
-            log.info('~~~ initialising ~~~')
+            #log.info('~~~ initialising ~~~')
             with PomdpParser(params.env_config) as ctx:
                 # creates model and solver
                 model = self.create_model(ctx.copy_env())
@@ -69,14 +70,15 @@ class PomdpRunner:
                     pomdp.add_configs(budget, belief, **kwargs)
 
             # have fun!
-            log.info('''
-            ++++++++++++++++++++++
-                Starting State:  {}
-                Starting Budget:  {}
-                Init Belief: {}
-                Time Horizon: {}
-                Max Play: {}
-            ++++++++++++++++++++++'''.format(model.curr_state, budget, belief, T, params.max_play))
+            if modo != "Benchmark":
+                log.info('''
+                ++++++++++++++++++++++
+                    Estado inicial:  {}
+                    Presupuesto:  {}
+                    Creencia: {}
+                    Horizonte de tiempo: {}
+                    Numero de juegos maximo: {}
+                ++++++++++++++++++++++'''.format(model.curr_state, budget, belief, T, params.max_play))
 
             for i in range(params.max_play):
                 # plan, take action and receive environment feedbacks
@@ -96,21 +98,28 @@ class PomdpRunner:
                 # print ino
                 if modo == "Iterativo":
                     log.info('\n'.join([
-                      'Taking action: {}'.format(action),
-                      'Observation: {}'.format(obs),
-                      'Reward: {}'.format(reward),
-                      'Budget: {}'.format(budget),
-                      'New state: {}'.format(new_state),
-                      'New Belief: {}'.format(belief),
+                      'Accion tomada: {}'.format(action),
+                      'Observacion: {}'.format(obs),
+                      'Recompensa: {}'.format(reward),
+                      'Presupuesto: {}'.format(budget),
+                      'Nuevo estado: {}'.format(new_state),
+                      'Nueva creencia: {}'.format(belief),
                       'Paso numero: {}'.format(i),
                       '=' * 20
                     ]))
 
                 if budget <= 0:
                     log.info('Budget spent.')
-            log.info('{} games played. Total reward = {}'.format(i , total_rewards))
-            steps.append(i)
-            rewards.append(total_rewards)
-        print(steps)
-        print(rewards)
+            log.info('{} juegos. Recompensa total acumulada = {}'.format(i , total_rewards))
+            steps = math.append(steps, i)
+            rewards = math.append(rewards, total_rewards)
+        if modo == "Benchmark":
+            mean_steps = steps.mean()
+            std_steps = steps.std()
+            mean_rewards = rewards.mean()
+            std_rewards = rewards.mean()
+            print("Valor medio pasos: ", mean_steps)
+            print("Desviacion tipica pasos: ", std_steps)
+            print("Valor medio recompensas: ", mean_rewards)
+            print("Desviacion tipica pasos: ", std_rewards)
         return pomdp

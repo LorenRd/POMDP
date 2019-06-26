@@ -53,7 +53,7 @@ class PBVI(Solver):
             gamma_action_obs.append(v)
         return gamma_action_obs
 
-    def solve(self, T):
+    def solve(self, T, modo):
         if self.solved:
             return
 

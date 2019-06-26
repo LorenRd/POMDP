@@ -48,7 +48,7 @@ if __name__ == '__main__':
                 algoritmo = "pomcp"
                 print("Algoritmo seleccionado:", algoritmo)
             elif numAlgoritmo == 2:
-                algoritmo = "pvbi"
+                algoritmo = "pbvi"
                 print("Algoritmo seleccionado:", algoritmo)
             else:
                 print("El número introducido no corresponde a ningún algoritmo.")
