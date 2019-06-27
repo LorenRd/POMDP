@@ -4,6 +4,7 @@ import argparse
 from pomdp_runner import PomdpRunner
 from util import RunnerParams
 import json
+from logger import Logger as log
 
 class SampleApp(tk.Tk):
 
@@ -12,8 +13,8 @@ class SampleApp(tk.Tk):
         self.shared_data = {
             "problema": tk.StringVar(),
             "algoritmo": tk.StringVar(),
-            "presupuesto": tk.DoubleVar(),
-            "intentos": tk.IntVar(),
+            "presupuesto": tk.StringVar(),
+            "intentos": tk.StringVar(),
             "modoEjecucion": tk.StringVar(),
 
         }
@@ -82,7 +83,7 @@ class StartPage(tk.Frame):
         self.controller.shared_data["problema"] = text
         if(text == "Tigre" or text == "Poison"):
             self.controller.show_frame("BudgetTries")
-        elif(text == "Tag"):
+        elif(text == "LaserTag"):
             self.controller.show_frame("Tries")
         else:
             self.controller.show_frame("PageOne")
@@ -177,12 +178,17 @@ class EjecutaPOMDP(tk.Frame):
         if(problema == "Tigre" or problema == "Veneno" ):
             if(budget =="Insert budget (1-n)"):
                 budget = float('inf')
-
+            else:
+                budget = float(budget)
             if (max_play == "Insert number of tries (1-n)"):
                 max_play = 100
+            else:
+                max_play = int(max_play)
         elif(problema == "LaserTag"):
             if (max_play == "Insert number of tries (1-n)"):
                 max_play = 100
+            else:
+                max_play = int(max_play)
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--config', type=str, default=algoritmo)
@@ -198,9 +204,13 @@ class EjecutaPOMDP(tk.Frame):
 
         with open(params.algo_config) as algo_config:
             algo_params = json.load(algo_config)
-            runner = PomdpRunner(params)
+            runner= PomdpRunner(params)
 
             runner.run(modo, problema, **algo_params)
+            runner.run()
+
+        self.controller.show_frame("PageThree")
+
 
 class PageThree(tk.Frame):
 
@@ -213,7 +223,7 @@ class PageThree(tk.Frame):
         button.pack()
 
         txt = tk.Text(self, width=40, height=10)
-        txt.insert(tk.END, 'HOLA')
+        txt.insert(tk.END, log)
         txt.pack()
 
 
