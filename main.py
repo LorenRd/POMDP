@@ -1,56 +1,34 @@
-from pomdprunner import pomdprunner
-
-def solve_algorithm (problem):
-    while True:
-        algorithm = input("Elige un algoritmo resolvedor: [A] POMCP, [B] PBVI \n").upper()
-        if algorithm not in "AB" or len(algorithm) != 1:
-            print("Elige un algoritmo resolvedor \n")
-        if action == 'A':
-            print("Elegiste POMCP!")
-            break
-        elif action == 'B':
-            print("Elegiste PBVI!")
-        break
-    execution_mode(problem, algorithm)
-
-def execution_mode (problem, algorithm):
-    while True:
-        mode = input("Elige un modo de ejecucion: [A] INTERACTIVA, [B] SILECIONSA, [C] BENCHMARK \n").upper()
-        if mode not in "ABC" or len(mode) != 1:
-            print("Elige un algoritmo resolvedor \n")
-        if action == 'A':
-            print("INTERACTIVA!")
-            break
-        elif action == 'B':
-            print("SILENCIOSA!")
-            break
-        elif action == 'C':
-            print("BENCHMARK -> 30 SIMULACIONES SILENCIOSAS!")
-            break
-
-    pomdprunner(problem, algorithm, mode)
-
+import argparse
+import os
+import json
+import multiprocessing
+from pomdp_runner import PomdpRunner
+from util import RunnerParams
 
 
 if __name__ == '__main__':
-    print("POMDP por Lorenzo y Jose Manuel")
-    while True:
-        action = input("Elige un problema: [A] Tigre, [B] Tag, [C] Problema 1, [D] Problema 2 \n").upper()
-        if action not in "ABCD" or len(action) != 1:
-            print("Elige un problema de la lista\n")
-        if action == 'A':
-            print("Elegiste Tigre!")
-            solve_algorithm(action)
-            break
-        elif action == 'B':
-            print("Elegiste Tag!")
-            solve_algorithm(action)
-            break
-        elif action == 'C':
-            print("Elegiste el problema 1!")
-            solve_algorithm(action)
-            break
-        elif action == 'D':
-            print("Elegiste el problema 2!")
-            solve_algorithm(action)
-            break
+    """
+    Parse generic params for the POMDP runner, and configurations for the chosen algorithm.
+    Algorithm configurations the JSON files in ./configs
+
+    Example usage:
+        > python main.py pomcp --env Tiger-2D.POMDP
+        > python main.py pbvi --env Tiger-2D.POMDP
+    """
+    parser = argparse.ArgumentParser(description='Solve pomdp')
+    parser.add_argument('config', type=str, help='The file name of algorithm configuration (without JSON extension)')
+    parser.add_argument('--env', type=str, default='GridWorld.POMDP', help='The name of environment\'s config file')
+    parser.add_argument('--budget', type=float, default=float('inf'), help='The total action budget (defeault to inf)')
+    parser.add_argument('--snapshot', type=bool, default=False, help='Whether to snapshot the belief tree after each episode')
+    parser.add_argument('--logfile', type=str, default=None, help='Logfile path')
+    parser.add_argument('--random_prior', type=bool, default=False,
+                        help='Whether or not to use a randomly generated distribution as prior belief, default to False')
+    parser.add_argument('--max_play', type=int, default=100, help='Maximum number of play steps')
+
+    args = vars(parser.parse_args())
+    params = RunnerParams(**args)
+
+    with open(params.algo_config) as algo_config:
+        algo_params = json.load(algo_config)
+        runner = PomdpRunner(params)
+        runner.run(**algo_params)

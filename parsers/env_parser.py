@@ -11,6 +11,11 @@ import os
 import itertools
 
 
+class PomdpxParser:
+    # TODO
+    pass
+
+
 class PomdpParser:
     def __init__(self, config_file):
         '''

@@ -1,15 +1,12 @@
 discount: 0.75
 values: reward
 states: tiger-left tiger-right
-actions: listen open-left open-right halt
-costs: -1 -1 -1 0
+actions: listen open-left open-right
+costs: 5 1 1
 observations: tiger-left tiger-right
 
 T: listen
 identity
-
-T: halt
-uniform
 
 T: open-left
 uniform
@@ -27,9 +24,6 @@ uniform
 O: open-right
 uniform
 
-O: halt
-uniform
-
 R: listen : tiger-left : * : * -1
 R: listen : tiger-right : * : * -1
 
@@ -38,7 +32,3 @@ R: open-left : tiger-right : * : * 10
 
 R: open-right : tiger-right : * : * -100
 R: open-right : tiger-left : * : * 10 
-
-R: halt : tiger-left : * : * 0
-R: halt : tiger-right : * : * 0
-

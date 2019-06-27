@@ -2,7 +2,7 @@ from solvers import Solver
 from util.helper import rand_choice, randint, round
 from util.helper import elem_distribution, ucb
 from util.belief_tree import BeliefTree
-from logger import logger as log
+from logger import Logger as log
 import numpy as np
 import time
 
@@ -137,7 +137,7 @@ class POMCP(Solver):
 
         return R
 
-    def solve(self, T):
+    def solve(self, T, modo):
         """
         Solves for up to T steps
         """
@@ -147,7 +147,8 @@ class POMCP(Solver):
             n += 1
             state = self.tree.root.sample_state()
             self.simulate(state, max_depth=T, h=self.tree.root.h, budget=self.tree.root.budget)
-        log.info('# Simulation = {}'.format(n))
+        if modo == "Iterativo":
+            log.info('# Simulacion -> {}'.format(n))
 
     def get_action(self, belief):
         """
