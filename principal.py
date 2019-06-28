@@ -12,8 +12,8 @@ if __name__ == '__main__':
         print("Seleccione un problema:")
         print("[1] - Tigre")
         print("[2] - LaserTag")
-        print("[3] - Problema1")
-        print("[4] - Problema2")
+        print("[3] - Recipientes")
+        print("[4] - Rocksample")
         opciones_problema = [1, 2, 3, 4]
 
         numero_correcto = False
@@ -30,17 +30,18 @@ if __name__ == '__main__':
                     print("Problema seleccionado:", problema)
                     num_intentos = float('inf')
                 elif num_problema == 3:
-                    problema = "Problema 1"
+                    problema = "Recipientes"
                     print("Problema seleccionado:", problema)
                 else:
-                    problema = "Problema 2"
+                    problema = "Rocksample"
+                    budget = float('inf')
                     print("Problema seleccionado:", problema)
 
                 print("Maximo numero de intentos: ", end="")
                 max_play = input()
                 if max_play == "":
                     max_play = float('inf')
-                if problema == "Tigre":
+                if problema == "Tigre" or problema == "Recipientes":
                     print("Maximo presupuesto: ", end="")
                     budget = input()
                     if budget == "":
@@ -48,12 +49,12 @@ if __name__ == '__main__':
             else:
                 print("El número seleccionado no corresponde a ningún problema.")
 
-        print("Seleccione un algoritmo resolvedor:")
-        print("[1] - POMCP")
-        print("[2] - PVBI")
-        opciones_algoritmo = ["pomcp", "pvbi"]
+        opciones_algoritmo = ["pomcp", "pbvi"]
         algoritmo = ""
         while algoritmo == "":
+            print("Seleccione un algoritmo resolvedor:")
+            print("[1] - POMCP")
+            print("[2] - PBVI")
             num_algoritmo = int(input())
             if num_algoritmo == 1:
                 algoritmo = "pomcp"
@@ -64,16 +65,16 @@ if __name__ == '__main__':
             else:
                 print("El número introducido no corresponde a ningún algoritmo.")
 
-        print("Seleccione un modo de ejecución:")
-        print("[1] - Iterativo")
-        print("[2] - Silencioso")
-        print("[3] - Benchmark")
         opciones_modo = [1, 2, 3]
         modo = ""
         while modo == "":
+            print("Seleccione un modo de ejecución:")
+            print("[1] - Interactivo")
+            print("[2] - Silencioso")
+            print("[3] - Benchmark")
             numModo = int(input())
             if numModo == 1:
-                modo = "Iterativo"
+                modo = "Interactivo"
                 print("Modo de ejecución seleccionado:", modo)
             elif numModo == 2:
                 modo = "Silencioso"
