@@ -191,6 +191,10 @@ class EjecutaPOMDP(tk.Frame):
         elif(problema == "LaserTag" or problema == "RockSample"):
             try:
                 max_play = int(max_play)
+                try:
+                    budget = float(budget)
+                except ValueError:
+                    budget = float('inf')
             except ValueError:
                 max_play = 100
                 try:
