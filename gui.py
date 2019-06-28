@@ -4,7 +4,6 @@ import argparse
 from pomdp_runner import PomdpRunner
 from util import RunnerParams
 import json
-from logger import Logger as log
 
 class SampleApp(tk.Tk):
 
@@ -118,8 +117,8 @@ class Tries(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         entry = tk.Entry(self, textvariable=self.controller.shared_data["intentos"])
+        #entry.insert(0, "Insert tries")
         entry.place(relx=0.4, rely=0.5)
-        entry.insert(0, "Insert tries")
 
         b1 = tk.Button(self, text="Algorithms", font=controller.button_font_small, command=lambda: controller.show_frame("PageOne"))
         b1.place(relx=0.4, rely=0.6)
@@ -194,8 +193,13 @@ class EjecutaPOMDP(tk.Frame):
                 max_play = int(max_play)
             except ValueError:
                 max_play = 100
+                try:
+                    budget = float(budget)
+                except ValueError:
+                    budget = float('inf')
 
         parser = argparse.ArgumentParser()
+
         parser.add_argument('--config', type=str, default=algoritmo)
         parser.add_argument('--env', type=str, default=problema + ".POMDP")
         parser.add_argument('--budget', type=float, default=budget)
@@ -213,8 +217,6 @@ class EjecutaPOMDP(tk.Frame):
 
             runner.run(modo, problema, **algo_params)
 
-        #self.controller.show_frame("PageThree")
-        salida = concatSalida.concat(self)
         self.controller.show_frame("PageThree")
 
 class PageThree(tk.Frame):
@@ -227,6 +229,11 @@ class PageThree(tk.Frame):
         button = tk.Button(self, text="Go to the start page", command=lambda: controller.show_frame("StartPage"))
         button.pack()
 
+        button2 = tk.Button(self, text="User inmputs", command=lambda: self.mostrarSalida())
+        button2.pack()
+
+
+    def mostrarSalida(self):
         txt = tk.Text(self, width=40, height=10)
         salida = concatSalida.concat(self)
         txt.insert(tk.END, salida)
@@ -235,7 +242,37 @@ class PageThree(tk.Frame):
 
 class concatSalida(tk.Frame):
     def concat(self):
-        salida = "Problema: "+ self.controller.shared_data["problema"].get() + "\n"+ "Algoritmo: "+ self.controller.shared_data["algoritmo"].get()+ "\n"+ "Presupuesto: "+ self.controller.shared_data["algoritmo"].get()+ "\n"+ "Intentos: "+ self.controller.shared_data["intentos"].get()+ "\n"+ "Modo ejecucion: "+ self.controller.shared_data["modoEjecucion"].get()
+
+        problema = self.controller.shared_data["problema"]
+        algoritmo = self.controller.shared_data["algoritmo"]
+        budget = self.controller.shared_data["presupuesto"].get()
+        max_play = self.controller.shared_data["intentos"].get()
+        modo = self.controller.shared_data["modoEjecucion"]
+
+        if(problema == "Tigre" or problema == "Recipientes"):
+            try:
+                budget = float(budget)
+                try:
+                    max_play = int(max_play)
+                except ValueError:
+                    max_play = 100
+            except ValueError:
+                budget = float('inf')
+                try:
+                    max_play = int(max_play)
+                except ValueError:
+                    max_play = 100
+        elif(problema == "LaserTag" or problema == "RockSample"):
+            try:
+                max_play = int(max_play)
+            except ValueError:
+                max_play = 100
+                try:
+                    budget = float(budget)
+                except ValueError:
+                    budget = float('inf')
+
+        salida = "Problema: "+ problema + "\n"+ "Algoritmo: "+ algoritmo+ "\n"+ "Presupuesto: "+ str(budget) + "\n"+ "Intentos: "+ str(max_play) + "\n"+ "Modo ejecucion: "+ modo
         return salida
 
 if __name__ == "__main__":
