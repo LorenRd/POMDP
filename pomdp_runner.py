@@ -77,6 +77,8 @@ class PomdpRunner:
                     condicion_parada = action == "open-left" or action == "open-right"
                 elif problema == "LaserTag":
                     condicion_parada = action == "Catch"
+                elif problema == "Recipientes":
+                    condicion_parada = action == "bebe-izq" or action == "bebe-med" or action == "bebe-der"
 
                 if params.snapshot and isinstance(pomdp, POMCP):
                     self.snapshot_tree(visualiser, pomdp.tree, '{}.gv'.format(i))
@@ -85,7 +87,7 @@ class PomdpRunner:
                 total_rewards += reward
                 budget -= cost
 
-                if modo == "Iterativo":
+                if modo == "Interactivo":
                     log.info('\n'.join([
                       'Accion tomada: {}'.format(action),
                       'Observacion: {}'.format(obs),

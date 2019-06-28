@@ -1,0 +1,75 @@
+#Problema de los recipientes.
+#Autores: Jose Manuel Maestre Rodriguez y Lorenzo Rondan Dominguez
+
+discount: 0.75
+values: reward
+states: agua-izq agua-med agua-der
+actions: huele-izq huele-med huele-der bebe-izq bebe-med bebe-der
+costs: 1 1 1 1 1 1
+observations: agua-izq agua-med agua-der
+
+T: huele-izq
+identity
+
+T: huele-med
+identity
+
+T: huele-der
+identity
+
+T: bebe-izq
+uniform
+
+T: bebe-med
+uniform
+
+T: bebe-der
+uniform
+
+O: huele-izq
+0.65 0.25 0.1
+0.30 0.55 0.15
+0.20 0.35 0.45
+
+O: huele-med
+0.55 0.30 0.15
+0.175 0.65 0.175
+0.15 0.30 0.55
+
+O: huele-der
+0.45 0.35 0.20
+0.15 0.55 0.30
+0.1 0.25 0.65
+
+O: bebe-izq
+uniform
+
+O: bebe-med
+uniform
+
+O: bebe-der
+uniform
+
+R: huele-izq : agua-izq : * : * -1
+R: huele-izq : agua-mid : * : * -1
+R: huele-izq : agua-der : * : * -1
+
+R: huele-med : agua-izq : * : * -1
+R: huele-med : agua-med : * : * -1
+R: huele-med : agua-der : * : * -1
+
+R: huele-der : agua-izq : * : * -1
+R: huele-der : agua-med : * : * -1
+R: huele-der : agua-der : * : * -1
+
+R: bebe-izq : agua-izq : * : * 10
+R: bebe-izq : agua-der : * : * -100
+R: bebe-izq : agua-med : * : * -100
+
+R: bebe-med : agua-med : * : * 10
+R: bebe-med : agua-izq : * : * -100
+R: bebe-med : agua-der : * : * -100
+
+R: bebe-der : agua-der : * : * 10
+R: bebe-der : agua-izq : * : * -100
+R: bebe-der : agua-med : * : * -100
