@@ -60,6 +60,7 @@ class StartPage(tk.Frame):
         tigerImage = tk.PhotoImage(file="images/tiger.png")
         tagImage = tk.PhotoImage(file="images/tag.png")
         poisonImage = tk.PhotoImage(file="images/poison.png")
+        rockImage = tk.PhotoImage(file="images/rock.png")
 
         # Botones
         b1 = tk.Button(self, text="Tigre", command=lambda: self.actualizaValorSigue("Tigre"))
@@ -76,17 +77,17 @@ class StartPage(tk.Frame):
         b3.image = poisonImage
         b4 = tk.Button(self, text="Rocksample", command=lambda: self.actualizaValorSigue("RockSample"))
         b4.place(relx=0.7, rely=0.6)
-        b4.config(image=poisonImage)
-        b4.image = poisonImage
+        b4.config(image=rockImage)
+        b4.image = rockImage
 
     def actualizaValorSigue(self, text):
         self.controller.shared_data["problema"] = text
         if(text == "Tigre" or text == "Recipientes"):
             self.controller.show_frame("BudgetTries")
-        elif(text == "LaserTag"):
+        elif(text == "LaserTag" or text == "RockSample"):
             self.controller.show_frame("Tries")
         else:
-            self.controller.show_frame("PageOne")
+            self.controller.show_frame("StartPage")
 
 class PageOne(tk.Frame):
 
@@ -113,12 +114,12 @@ class Tries(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Insert a budget", font=controller.title_font)
+        label = tk.Label(self, text="Insert number of tries", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
         entry = tk.Entry(self, textvariable=self.controller.shared_data["intentos"])
         entry.place(relx=0.4, rely=0.5)
-        entry.insert(0, "Insert tries (1-n)")
+        entry.insert(0, "Insert tries")
 
         b1 = tk.Button(self, text="Algorithms", font=controller.button_font_small, command=lambda: controller.show_frame("PageOne"))
         b1.place(relx=0.4, rely=0.6)
@@ -133,11 +134,11 @@ class BudgetTries(tk.Frame):
 
         entryBudget = tk.Entry(self, textvariable=self.controller.shared_data["presupuesto"])
         entryBudget.place(relx=0.4, rely=0.3)
-        entryBudget.insert(0, "Insert budget (1-n)")
+        entryBudget.insert(0, "Insert budget")
 
         entryTries = tk.Entry(self, textvariable=self.controller.shared_data["intentos"])
         entryTries.place(relx=0.4, rely=0.5)
-        entryTries.insert(0, "Insert number of tries (1-n)")
+        entryTries.insert(0, "Insert tries")
 
         b1 = tk.Button(self, text="Algorithms", font=controller.button_font_small, command=lambda: controller.show_frame("PageOne"))
         b1.place(relx=0.4, rely=0.6)
@@ -175,20 +176,24 @@ class EjecutaPOMDP(tk.Frame):
         max_play = self.controller.shared_data["intentos"].get()
         modo = self.controller.shared_data["modoEjecucion"]
 
-        if(problema == "Tigre" or problema == "Recipientes" ):
-            if(budget =="Insert budget (1-n)"):
-                budget = float('inf')
-            else:
+        if(problema == "Tigre" or problema == "Recipientes"):
+            try:
                 budget = float(budget)
-            if (max_play == "Insert number of tries (1-n)"):
-                max_play = 100
-            else:
+                try:
+                    max_play = int(max_play)
+                except ValueError:
+                    max_play = 100
+            except ValueError:
+                budget = float('inf')
+                try:
+                    max_play = int(max_play)
+                except ValueError:
+                    max_play = 100
+        elif(problema == "LaserTag" or problema == "RockSample"):
+            try:
                 max_play = int(max_play)
-        elif(problema == "LaserTag"):
-            if (max_play == "Insert number of tries (1-n)"):
+            except ValueError:
                 max_play = 100
-            else:
-                max_play = int(max_play)
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--config', type=str, default=algoritmo)
@@ -208,8 +213,9 @@ class EjecutaPOMDP(tk.Frame):
 
             runner.run(modo, problema, **algo_params)
 
+        #self.controller.show_frame("PageThree")
+        salida = concatSalida.concat(self)
         self.controller.show_frame("PageThree")
-
 
 class PageThree(tk.Frame):
 
@@ -222,9 +228,15 @@ class PageThree(tk.Frame):
         button.pack()
 
         txt = tk.Text(self, width=40, height=10)
-        txt.insert(tk.END, log)
+        salida = concatSalida.concat(self)
+        txt.insert(tk.END, salida)
         txt.pack()
 
+
+class concatSalida(tk.Frame):
+    def concat(self):
+        salida = "Problema: "+ self.controller.shared_data["problema"].get() + "\n"+ "Algoritmo: "+ self.controller.shared_data["algoritmo"].get()+ "\n"+ "Presupuesto: "+ self.controller.shared_data["algoritmo"].get()+ "\n"+ "Intentos: "+ self.controller.shared_data["intentos"].get()+ "\n"+ "Modo ejecucion: "+ self.controller.shared_data["modoEjecucion"].get()
+        return salida
 
 if __name__ == "__main__":
     app = SampleApp()
