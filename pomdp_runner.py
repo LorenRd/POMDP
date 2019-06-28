@@ -40,6 +40,8 @@ class PomdpRunner:
             c = 29
         while c < 30:
             c += 1
+            if modo == "Benchmark":
+                log.info("===================== Ejecucion " + str(c) + '=====================' )
             visualiser = GraphViz(description='tmp')
             params, pomdp = self.params, None
             total_rewards, budget = 0, params.budget
@@ -104,7 +106,7 @@ class PomdpRunner:
                 if params.max_play != 'inf' and params.max_play <= i:
                     log.info('Se ha sobrepasado el número máximo de pasos establecido.')
 
-            log.info('{} pasos ejecutados. Recompensa total acumulada = {}'.format(i, total_rewards))
+            log.info('{} pasos ejecutados. Recompensa total acumulada = {}\n'.format(i, total_rewards))
             steps = math.append(steps, i)
             rewards = math.append(rewards, total_rewards)
 
@@ -113,8 +115,12 @@ class PomdpRunner:
             std_steps = steps.std()
             mean_rewards = rewards.mean()
             std_rewards = rewards.std()
-            print("Valor medio pasos: ", mean_steps)
-            print("Desviacion tipica pasos: ", std_steps)
-            print("Valor medio recompensas: ", mean_rewards)
-            print("Desviacion tipica recompensas: ", std_rewards)
+            print("#########################################################################################")
+            print("#    RESULTADOS DEL BENCHMARK:")
+            print("#    Valor medio pasos: ", mean_steps)
+            print("#    Desviacion tipica pasos: ", std_steps)
+            print("#    Valor medio recompensas: ", mean_rewards)
+            print("#    Desviacion tipica recompensas: ", std_rewards)
+            print("#########################################################################################")
+
         return pomdp
