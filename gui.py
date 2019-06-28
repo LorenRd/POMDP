@@ -74,7 +74,7 @@ class StartPage(tk.Frame):
         b3.place(relx=0.1, rely=0.6)
         b3.config(image=poisonImage)
         b3.image = poisonImage
-        b4 = tk.Button(self, text="Rocksample", command=lambda: self.actualizaValorSigue("RockSample"))
+        b4 = tk.Button(self, text="Rocksample", command=lambda: self.actualizaValorSigue("Rocksample"))
         b4.place(relx=0.7, rely=0.6)
         b4.config(image=rockImage)
         b4.image = rockImage
@@ -83,7 +83,7 @@ class StartPage(tk.Frame):
         self.controller.shared_data["problema"] = text
         if(text == "Tigre" or text == "Recipientes"):
             self.controller.show_frame("BudgetTries")
-        elif(text == "LaserTag" or text == "RockSample"):
+        elif(text == "LaserTag" or text == "Rocksample"):
             self.controller.show_frame("Tries")
         else:
             self.controller.show_frame("StartPage")
@@ -188,7 +188,7 @@ class EjecutaPOMDP(tk.Frame):
                     max_play = int(max_play)
                 except ValueError:
                     max_play = 100
-        elif(problema == "LaserTag" or problema == "RockSample"):
+        elif(problema == "LaserTag" or problema == "Rocksample"):
             try:
                 max_play = int(max_play)
                 try:
@@ -266,7 +266,7 @@ class concatSalida(tk.Frame):
                     max_play = int(max_play)
                 except ValueError:
                     max_play = 100
-        elif(problema == "LaserTag" or problema == "RockSample"):
+        elif(problema == "LaserTag" or problema == "Rocksample"):
             try:
                 max_play = int(max_play)
             except ValueError:
